@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("76PEDV84KFQ9VafGwGXmbhT62rTmDXV1whyDzcU94vfU");
+declare_id!("EZz9VjY1SR1ZKDUA4VmipqUjTns73y7ig9BKxicUJVy4");
 
 #[program]
 pub mod biblioteca_tolkien {
@@ -31,20 +31,61 @@ pub mod biblioteca_tolkien {
             nombre,
             paginas,
             editorial,
-            status: false, // por defecto pendiente de leer
+            status: false,
             formato,
         };
 
         context.accounts.biblioteca.libros.push(libro);
+
         Ok(())
     }
 
-    pub fn eliminar_libro(context: Context<NuevoLibro>) -> Result<()> {
-        let libros = &context.accounts.biblioteca.libros;
-        msg!("La lista de libros es: {:#?}", libros);
+    pub fn ver_libros(context: Context<NuevoLibro>) -> Result<()> {
+        msg!(
+            "La lista de libros es: {:#?}",
+            context.accounts.biblioteca.libros
+        );
+
+        Ok(())
+    }
+
+    pub fn eliminar_libro(context: Context<NuevoLibro>, nombre: String) -> Result<()> {
+        let libros = &mut context.accounts.biblioteca.libros;
+
+        for i in 0..libros.len() {
+            if libros[i].nombre == nombre {
+                libros.remove(i);
+                msg!("Libro {} eliminado!", nombre);
+                break;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn alternar_estado(context: Context<NuevoLibro>, nombre: String) -> Result<()> {
+        let libros = &mut context.accounts.biblioteca.libros;
+
+        for i in 0..libros.len() {
+            if libros[i].nombre == nombre {
+                let estado_actual = libros[i].status;
+                libros[i].status = !estado_actual;
+
+                msg!(
+                    "El libro {} ahora tiene estado de lectura: {}",
+                    nombre,
+                    libros[i].status
+                );
+
+                break;
+            }
+        }
+
         Ok(())
     }
 }
+
+
 
 #[account]
 #[derive(InitSpace)]
@@ -102,3 +143,4 @@ pub struct NuevoLibro<'info> {
     #[account(mut)]
     pub biblioteca: Account<'info, BibliotecaTolkien>,
 }
+
