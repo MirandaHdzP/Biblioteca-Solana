@@ -143,4 +143,3 @@ pub struct NuevoLibro<'info> {
     #[account(mut)]
     pub biblioteca: Account<'info, BibliotecaTolkien>,
 }
-
